@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { requireUserId } from "@/lib/auth/session";
 import { getQueryClient } from "@/lib/query-client";
@@ -16,11 +16,10 @@ export default async function OrderDetailPage({
   const { id } = await params;
 
   const order = await getOrder(userId, id);
-  const queryClient = getQueryClient();
+  if (!order) notFound();
 
-  if (order) {
-    queryClient.setQueryData(["orders", id], { data: order });
-  }
+  const queryClient = getQueryClient();
+  queryClient.setQueryData(["orders", id], { data: order });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
