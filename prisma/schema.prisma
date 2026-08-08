@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Order settlement status — derived at read time, never stored.
+/// Priority: paid > overdue > partially_paid > pending
+enum OrderStatus {
+  pending
+  partially_paid
+  paid
+  overdue
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  orders       Order[]
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  customer    String
+  dueDate     DateTime    @db.Date
+  totalCents  Int
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lineItems   OrderItem[]
+  payments    Payment[]
+
+  @@index([userId, dueDate])
+}
+
+model OrderItem {
+  id             String @id @default(cuid())
+  orderId        String
+  description    String
+  quantity       Int
+  unitPriceCents Int
+  order          Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  orderId     String
+  amountCents Int
+  paidAt      DateTime @db.Date
+  note        String?
+  createdAt   DateTime @default(now())
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, paidAt])
+}
