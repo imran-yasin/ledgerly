@@ -27,12 +27,12 @@ export default function RegisterPage() {
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <Input id="password" name="password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={12} placeholder="••••••••" className="pr-10" />
+                <Input id="password" name="password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={8} placeholder="••••••••" className="pr-10" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" tabIndex={-1}>
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground">At least 12 characters</p>
+              <p className="text-xs text-muted-foreground">At least 8 characters</p>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" disabled={loading} className="w-full">
